@@ -14,7 +14,8 @@ function calcDday(expiresAt) {
 function formatDatetime(iso) {
   if (!iso) return '-';
   const d = new Date(iso);
-  return d.toLocaleString('ko-KR', { hour12: false });
+  const p = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}.${p(d.getMonth()+1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
 }
 
 function formatDate(iso) {
@@ -138,7 +139,21 @@ function updateAR(items) {
   // 스냅샷 이미지 설정 (백엔드 연동 시 실제 URL로 교체)
   const img = document.getElementById('camera-snapshot');
   if (!USE_MOCK) {
-    img.src = getSnapshotUrl();
+    const showFallback = () => {
+      img.onerror = null;
+      const c = document.createElement('canvas');
+      c.width = 640; c.height = 480;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#1a1a2e';
+      ctx.fillRect(0, 0, 640, 480);
+      ctx.fillStyle = '#555';
+      ctx.font = '18px sans-serif';
+      ctx.fillText('카메라 스냅샷 (연결 실패)', 180, 240);
+      img.src = c.toDataURL();
+    };
+
+    img.onerror = showFallback;
+    img.src = getSnapshotUrl() + '?t=' + Date.now(); // 캐시 방지
   } else {
     // Mock: 빈 이미지 대신 회색 배경 Canvas를 직접 그림
     const c = document.createElement('canvas');

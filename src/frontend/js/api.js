@@ -28,7 +28,8 @@ async function fetchItemsByCategory(category) {
     category:    item.category,
     detected_at: item.found_at,
     expires_at:  item.dispose_at,
-    image_path:  item.image_url ?? '',
+    image_path:      item.image_url ?? '',
+    full_image_url:  item.full_image_url ?? '',
     bbox: item.bbox ? {
       x:      item.bbox.x,
       y:      item.bbox.y,
